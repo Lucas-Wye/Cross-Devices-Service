@@ -1,0 +1,18 @@
+{{template "header.html" .}}
+	<div class="lead">文件列表</div>
+
+<table class="table table-bordered">
+	<tbody><tr><th>文件名</th><th>下载</th></tr>
+	{{range $item := .list}}
+		<tr>
+			<td>{{$item}}</td>
+			<td>
+				<form action="/download" method="post" enctype="multipart/form-data">
+					<button type="submit" class="btn btn-sm btn-success" name="filename" value="{{$item}}">下载</button>
+				</form>
+			</td>
+		</tr>
+	{{end}}
+</tbody></table>
+
+{{template "footer.html".}}

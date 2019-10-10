@@ -5,6 +5,7 @@ Run `bee run` to start the service.
 
 ## detail
 > login   
+> file list
 > file upload and download   
 > log record   
  

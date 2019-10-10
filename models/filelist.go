@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"io/ioutil"
+	"strings"
 )
 
 var filelist = "./upload/filelist"
@@ -27,20 +28,28 @@ func GetFileList() []string {
 	// return res
 
 	pathname := "./upload"
+	res = GetAllFile(pathname)
+	// fmt.Println(res)
+	return res
+}
+
+// 递归读取目录下的所有文件
+func GetAllFile(pathname string) []string {
 	rd, err := ioutil.ReadDir(pathname)
 	checkError(err)
+	var res []string
 	for _, fi := range rd {
-		// if fi.IsDir() {
-		// 	fmt.Printf("[%s]\n", pathname+"\\"+fi.Name())
-		// 	GetAllFile(pathname + fi.Name() + "\\")
-		// } else {
-		// 	fmt.Println(fi.Name())
-		// }
-		res = append(res, string(fi.Name()))
+		filename := fi.Name()
+		if fi.IsDir() {
+			tmp := GetAllFile(pathname + "/" + filename)
+			res = append(res, tmp...)
+		} else {
+			t := pathname + "/" + filename
+			t = strings.Replace(t, "./upload/", "", -1)
+			res = append(res, t)
+		}
 	}
-	fmt.Println(res)
 	return res
-
 }
 
 // 上传的文件写入到清单中

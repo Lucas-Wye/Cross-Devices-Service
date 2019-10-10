@@ -21,7 +21,7 @@ func (this *FileController) Prepare() {
 
 // 展示页面
 func (c *FileController) GetUpload() {
-	fmt.Println("upload here")
+	fmt.Println("Upload here.")
 	c.TplName = "upload.html"
 }
 
@@ -37,7 +37,7 @@ func (this *FileController) Upload() {
 
 // 文件列表
 func (this *FileController) GetList() {
-	fmt.Print("download here")
+	fmt.Println("Download here.")
 	this.Data["list"] = models.GetFileList()
 	this.TplName = "download.html"
 }

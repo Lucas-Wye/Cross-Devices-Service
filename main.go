@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "upper/routers"
+	_ "FileService/routers"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"

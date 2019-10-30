@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"upper/controllers"
+	"FileService/controllers"
 
 	"github.com/astaxie/beego"
 )
@@ -16,6 +16,5 @@ func init() {
 	beego.Router("/download", &controllers.FileController{}, "post:Download")
 
 	// 上传文件目录
-	beego.SetStaticPath("./upload", "upload")
-
+	beego.SetStaticPath(controllers.DownloadPath, "upload")
 }

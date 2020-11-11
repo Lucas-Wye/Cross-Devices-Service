@@ -18,7 +18,7 @@ func Secret(user, realm string) string {
 }
 
 func (this *MainController) Prepare() {
-	a := auth.NewBasicAuthenticator("example.com", Secret)
+	a := auth.NewBasicAuthenticator(ServiceName, Secret)
 	if username := a.CheckAuth(this.Ctx.Request); username == "" {
 		a.RequireAuth(this.Ctx.ResponseWriter, this.Ctx.Request)
 	}

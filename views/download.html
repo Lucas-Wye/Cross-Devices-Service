@@ -1,14 +1,17 @@
 {{template "header.html" .}}
-	<div class="lead">文件列表</div>
+<form method="get" action="/upload">
+    <button type="submit" class="btn btn-sm btn-success">Upload files</button>
+</form>
+</br>
 
 <table class="table table-bordered">
-	<tbody><tr><th>文件名</th><th>下载</th></tr>
+	<tbody><tr><th>Filename</th><th>Download</th></tr>
 	{{range $item := .list}}
 		<tr>
 			<td>{{$item}}</td>
 			<td>
 				<form action="/download" method="post" enctype="multipart/form-data">
-					<button type="submit" class="btn btn-sm btn-success" name="filename" value="{{$item}}">下载</button>
+					<button type="submit" class="btn btn-sm btn-success" name="filename" value="{{$item}}">Download</button>
 				</form>
 			</td>
 		</tr>

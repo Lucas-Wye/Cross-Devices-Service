@@ -8,13 +8,13 @@ import (
 
 func init() {
 	beego.Router("/", &controllers.MainController{}, "get:Get")
-
-	// 文件
+	// files
 	beego.Router("/upload", &controllers.FileController{}, "get:GetUpload")
 	beego.Router("/upload", &controllers.FileController{}, "post:Upload")
 	beego.Router("/download", &controllers.FileController{}, "get:GetList")
 	beego.Router("/download", &controllers.FileController{}, "post:Download")
 
-	// 上传文件目录
-	beego.SetStaticPath(controllers.DownloadPath, "upload")
+	// words
+	beego.Router(controllers.CopyPastePath, &controllers.FileController{}, "get:Paste")
+	beego.Router(controllers.CopyPastePath, &controllers.FileController{}, "post:Copy")
 }

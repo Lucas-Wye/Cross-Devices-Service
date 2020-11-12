@@ -28,7 +28,6 @@ start(){
   if [ $? -eq "0" ]; then 
     echo ">>> ${BINARY_NAME} is already running PID=${pid} <<<" 
   else 
-    make package
     nohup ./$BINARY_NAME > /dev/null &
     echo $! > $PID
     echo ">>> start $BINARY_NAME successed PID=$! <<<" 

@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"FileService/controllers"
+	"CrossDevicesService/controllers"
 
 	"github.com/astaxie/beego"
 )

@@ -8,6 +8,14 @@ import (
 	_ "github.com/go-sql-driver/mysql" // import your used sql driver
 )
 
+func GetLocalDirPath() string {
+	key := os.Getenv("LOCAL_DIR_PATH")
+	if key == "" {
+		logs.Error("Env LOCAL_DIR_PATH is empty")
+	}
+	return key
+}
+
 func getDatabaseSource() string {
 	key := os.Getenv("DATABASE_SOURCE")
 	if key == "" {

@@ -1,7 +1,7 @@
 package test
 
 import (
-	_ "FileService/routers"
+	_ "CrossDevicesService/routers"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"

@@ -1,13 +1,14 @@
 package controllers
 
 import (
-	models "FileService/models"
+	models "CrossDevicesService/models"
 
 	auth "github.com/abbot/go-http-auth"
 	"github.com/astaxie/beego"
 )
 
-const DownloadPath = "./controllers"
+var DownloadPath = models.GetLocalDirPath()
+
 const CopyPastePath = "/copy"
 const ServiceName = "Cross Devices Service"
 

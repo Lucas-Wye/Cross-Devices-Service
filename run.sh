@@ -1,5 +1,5 @@
 #!/bin/bash
-FILE_NAME=main
+FILE_NAME=CrossDevicesService
 BINARY_NAME=$FILE_NAME
 
 # PID文件

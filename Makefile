@@ -1,5 +1,5 @@
 # Binary name
-BINARY=FileService
+BINARY=CrossDevicesService
 VERSION=1.0
 
 run:

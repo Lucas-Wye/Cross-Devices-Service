@@ -4,8 +4,8 @@ import (
 	"os"
 
 	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
-	_ "github.com/go-sql-driver/mysql" // import your used sql driver
+	// "github.com/astaxie/beego/orm"
+	// _ "github.com/go-sql-driver/mysql"
 )
 
 func GetLocalDirPath() string {
@@ -25,6 +25,7 @@ func getDatabaseSource() string {
 	return key
 }
 
+/*
 func init() {
 	// connect to DB
 	maxIdle := 500
@@ -47,9 +48,4 @@ func init() {
 	// orm.RunSyncdb("default", false, true)
 	// orm.Debug = true
 }
-
-func checkError(err error) {
-	if err != nil {
-		logs.Error(err)
-	}
-}
+*/

@@ -11,6 +11,7 @@ var DownloadPath = models.GetLocalDirPath()
 
 const CopyPastePath = "/copy"
 const ServiceName = "Cross Devices Service"
+const CopyPasteFile = "./logs/copy_paste.txt"
 
 type FileController struct {
 	beego.Controller
@@ -46,14 +47,16 @@ func (this *FileController) Download() {
 }
 
 func (c *FileController) Paste() {
-	c.Data["input"] = models.ReadFromCopyPaste()
+	// c.Data["input"] = models.ReadFromCopyPaste()
+	c.Data["input"] = models.ReadFromFile(CopyPasteFile)
 	c.TplName = "copy_paste.html"
 }
 
 func (c *FileController) Copy() {
 	input := c.GetString("input")
 	if input != "" {
-		models.Write2CopyPaste(input)
+		// models.Write2CopyPaste(input)
+		models.WriteToFile(CopyPasteFile, "\n"+input)
 	}
 	c.Redirect(CopyPastePath, 302)
 }

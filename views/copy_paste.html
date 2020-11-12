@@ -1,17 +1,17 @@
 {{template "header.html" .}}
 <div>
-  {{range $i := .input}}
-      {{$i}}
-      </br>
-  {{end}}
-</div>
-
-</br>
-<div>
   <form action="/copy" method="post" enctype="application/x-www-form-urlencoded; charset=UTF-8" accept-charset="UTF-8">
     <textarea placeholder="Copy Here" class="form-control" rows="3" name="input"></textarea>
     </br><button type="submit" class="btn btn-sm btn-success">Submit</button>
   </form>
+</div>
+
+</br>
+<div>
+  {{range $i := .input}}
+      {{$i}}
+      </br>
+  {{end}}
 </div>
 
 {{template "footer.html".}}

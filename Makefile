@@ -31,6 +31,8 @@ release_windows:
 
 # Release for different platforms
 release: release_mac release_linux release_windows
+	mkdir -p release	
+	mv ${BINARY}-* release
 
 clean:
 		go clean

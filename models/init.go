@@ -16,6 +16,22 @@ func GetLocalDirPath() string {
 	return key
 }
 
+func GetLocalUsername() string {
+	key := os.Getenv("CROSS_DEVICES_SERVICE_USERNAME")
+	if key == "" {
+		logs.Error("Env CROSS_DEVICES_SERVICE_USERNAME is empty")
+	}
+	return key
+}
+
+func GetLocalPassword() string {
+	key := os.Getenv("CROSS_DEVICES_SERVICE_PASSWORD")
+	if key == "" {
+		logs.Error("Env CROSS_DEVICES_SERVICE_PASSWORD is empty")
+	}
+	return key
+}
+
 func getDatabaseSource() string {
 	key := os.Getenv("DATABASE_SOURCE")
 	if key == "" {

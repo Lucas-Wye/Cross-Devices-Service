@@ -31,9 +31,14 @@ release_windows:
 
 # Release for different platforms
 release: release_mac release_linux release_windows
+	rm -rf release
 	mkdir -p release	
 	mv ${BINARY}-* release
-
+	cp -r conf release
+	cp -r static release
+	cp -r views release
+	tar -zcvf release.tar.gz release/ 
+	rm -rf release
 clean:
 		go clean
 		rm ${BINARY}*

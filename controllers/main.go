@@ -11,8 +11,11 @@ type MainController struct {
 }
 
 func Secret(user, realm string) string {
-	if user == models.GetLocalUsername() {
-		return models.GetLocalPassword()
+	if user == models.GetAdminUsername() {
+		return models.GetAdminPassword()
+	}
+	if user == models.GetNormalUsername() {
+		return models.GetNormalPassword()
 	}
 	return ""
 }

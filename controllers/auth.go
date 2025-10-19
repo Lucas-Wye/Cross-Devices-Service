@@ -74,8 +74,10 @@ func (a *BasicAuth) CheckAuth(r *http.Request) string {
 	}
 	compare := bcrypt.CompareHashAndPassword
 	if compare([]byte(secret), []byte(password)) != nil {
+		// fmt.Println("[77] error", secret, password)
 		return ""
 	}
+	// fmt.Println("[80] return success")
 	return pair[0]
 }
 

@@ -37,6 +37,7 @@ release: release_mac release_linux release_windows
 	cp -r conf release
 	cp -r static release
 	cp -r views release
+	cp usage.md release
 	tar -zcvf release.tar.gz release/ 
 	rm -rf release
 clean:

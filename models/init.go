@@ -16,18 +16,34 @@ func GetLocalDirPath() string {
 	return key
 }
 
-func GetLocalUsername() string {
-	key := os.Getenv("CROSS_DEVICES_SERVICE_USERNAME")
+func GetAdminUsername() string {
+	key := os.Getenv("ADMIN_USERNAME")
 	if key == "" {
-		logs.Error("Env CROSS_DEVICES_SERVICE_USERNAME is empty")
+		logs.Error("Env ADMIN_USERNAME is empty")
 	}
 	return key
 }
 
-func GetLocalPassword() string {
-	key := os.Getenv("CROSS_DEVICES_SERVICE_PASSWORD")
+func GetAdminPassword() string {
+	key := os.Getenv("ADMIN_PASSWORD")
 	if key == "" {
-		logs.Error("Env CROSS_DEVICES_SERVICE_PASSWORD is empty")
+		logs.Error("Env ADMIN_PASSWORD is empty")
+	}
+	return key
+}
+
+func GetNormalUsername() string {
+	key := os.Getenv("NORMAL_USERNAME")
+	if key == "" {
+		logs.Error("Env NORMAL_USERNAME is empty")
+	}
+	return key
+}
+
+func GetNormalPassword() string {
+	key := os.Getenv("NORMAL_PASSWORD")
+	if key == "" {
+		logs.Error("Env NORMAL_PASSWORD is empty")
 	}
 	return key
 }

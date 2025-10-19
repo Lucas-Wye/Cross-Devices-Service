@@ -1,5 +1,11 @@
 {{template "header.html" .}}
 	<div class="lead">文件上传</div>
+{{if .success}}
+<div class="alert alert-success" role="alert">上传成功：{{.filename}}</div>
+{{end}}
+{{if .error}}
+<div class="alert alert-danger" role="alert">{{.error}}</div>
+{{end}}
 <form id="fform" action="/upload" method="post" enctype="multipart/form-data">
    		<input id="uploadfile" name="uploadfile" type="file"/></br>
       <input type="submit" value="上传"/>

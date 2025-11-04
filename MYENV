@@ -1,0 +1,7 @@
+export LOCAL_DIR_PATH="/WangRenfeng/wya/zewen/code/Cross-Devices-Service/tmp/release"
+
+export ADMIN_USERNAME="admin" 
+export ADMIN_PASSWORD="\$2a\$10\$gdt6CfQlR/OdTEWxWkV2Ve0yZiD3wBGKk5a65dc0T8bPdzsfK/8Yq" 
+
+export NORMAL_USERNAME="user"
+export NORMAL_PASSWORD="\$2a\$10\$gdt6CfQlR/OdTEWxWkV2Ve0yZiD3wBGKk5a65dc0T8bPdzsfK/8Yq" 

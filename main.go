@@ -32,6 +32,7 @@ func main() {
 		logs.Async()
 		logs.Async(1e3)
 
+		beego.BConfig.WebConfig.Session.SessionOn = true
 		beego.Run()
 	}
 }

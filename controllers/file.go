@@ -19,20 +19,24 @@ const CopyPasteFile = "./logs/copy_paste.txt"
 
 type FileController struct {
 	beego.Controller
-	userRole string
+	user *models.User
 }
 
 func (this *FileController) Prepare() {
-	a := NewBasicAuthenticator(ServiceName, Secret)
-	if username := a.CheckAuth(this.Ctx.Request); username == "" {
-		a.RequireAuth(this.Ctx.ResponseWriter, this.Ctx.Request)
-	} else {
-		if username == models.GetAdminUsername() {
-			this.userRole = "admin"
-		} else {
-			this.userRole = "normal"
-		}
+	sessionUser := this.GetSession("user")
+	if sessionUser == nil {
+		this.Redirect("/login", 302)
+		this.StopRun()
 	}
+
+	// It's better to store just the username in session and refetch user data
+	// to ensure permissions are always up-to-date.
+	user, ok := models.GetUser(sessionUser.(*models.User).Username)
+	if !ok {
+		this.Redirect("/login", 302)
+		this.StopRun()
+	}
+	this.user = user
 }
 
 func (c *FileController) GetUpload() {
@@ -41,11 +45,29 @@ func (c *FileController) GetUpload() {
 		c.Data["success"] = true
 		c.Data["filename"] = c.GetString("filename")
 	}
+	c.Data["user"] = c.user
 	// 如果之前在同一请求中设置了错误信息，直接展示
 	c.TplName = "upload.html"
 }
 
 func (this *FileController) Upload() {
+	dir := this.GetString("dir")
+	hasPermission := false
+	for _, p := range this.user.Permissions {
+		if (dir == "" && p.Path == "shared") || (dir == p.Path) {
+			if p.Write {
+				hasPermission = true
+				break
+			}
+		}
+	}
+
+	if !hasPermission {
+		this.Data["error"] = "没有上传权限"
+		this.TplName = "upload.html"
+		return
+	}
+
 	f, h, err := this.GetFile("uploadfile") // 读取上传文件
 	if err != nil {
 		this.Data["error"] = "未选择文件或读取文件失败"
@@ -54,15 +76,23 @@ func (this *FileController) Upload() {
 	}
 	defer f.Close()
 
+	targetDir := DownloadPath
+	if dir != "" {
+		targetDir = filepath.Join(DownloadPath, dir)
+		if _, err := os.Stat(targetDir); os.IsNotExist(err) {
+			os.MkdirAll(targetDir, 0755)
+		}
+	}
+
 	// 计算目标文件名，若已存在则自动加后缀(1),(2)...
 	finalName := h.Filename
-	destPath := filepath.Join(DownloadPath, finalName)
+	destPath := filepath.Join(targetDir, finalName)
 	if _, statErr := os.Stat(destPath); statErr == nil {
 		base := strings.TrimSuffix(finalName, filepath.Ext(finalName))
 		ext := filepath.Ext(finalName)
 		for i := 1; ; i++ {
 			candidate := fmt.Sprintf("%s(%d)%s", base, i, ext)
-			candidatePath := filepath.Join(DownloadPath, candidate)
+			candidatePath := filepath.Join(targetDir, candidate)
 			if _, err := os.Stat(candidatePath); os.IsNotExist(err) {
 				finalName = candidate
 				destPath = candidatePath
@@ -78,25 +108,49 @@ func (this *FileController) Upload() {
 	}
 
 	// 成功后重定向到上传页并附带成功提示（避免重复提交）
-	this.Redirect("/upload?success=1&filename="+url.QueryEscape(finalName), 302)
+	redirectURL := "/upload?success=1&filename=" + url.QueryEscape(finalName)
+	if dir != "" {
+		redirectURL += "&dir=" + url.QueryEscape(dir)
+	}
+	this.Redirect(redirectURL, 302)
 }
 
 func (this *FileController) GetList() {
-	if this.userRole != "admin" {
-		this.Abort("403")
-		return
+	var readableFiles []models.File
+	for _, p := range this.user.Permissions {
+		if p.Read {
+			dirPath := filepath.Join(DownloadPath, p.Path)
+			if _, err := os.Stat(dirPath); !os.IsNotExist(err) {
+				files := models.GetFileList(dirPath)
+				for i := range files {
+					files[i].Path = p.Path // Add relative path info
+				}
+				readableFiles = append(readableFiles, files...)
+			}
+		}
 	}
-	this.Data["list"] = models.GetFileList(DownloadPath)
+	this.Data["list"] = readableFiles
 	this.TplName = "download.html"
 }
 
 func (this *FileController) Download() {
-	if this.userRole != "admin" {
+	dir := this.GetString("dir")
+	filename := this.GetString("filename")
+	hasPermission := false
+	for _, p := range this.user.Permissions {
+		if ((dir == "" && p.Path == "shared") || (dir == p.Path)) && p.Read {
+			hasPermission = true
+			break
+		}
+	}
+
+	if !hasPermission {
 		this.Abort("403")
 		return
 	}
-	filename := this.GetString("filename")
-	this.Ctx.Output.Download(DownloadPath + "/" + filename)
+
+	targetPath := filepath.Join(DownloadPath, dir, filename)
+	this.Ctx.Output.Download(targetPath)
 }
 
 func (c *FileController) Paste() {

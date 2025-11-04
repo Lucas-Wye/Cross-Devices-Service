@@ -5,13 +5,15 @@
 </br>
 
 <table class="table table-bordered">
-	<tbody><tr><th>Filename</th><th>Download</th></tr>
+	<tbody><tr><th>Directory</th><th>Filename</th><th>Download</th></tr>
 	{{range $item := .list}}
 		<tr>
-			<td>{{$item}}</td>
+			<td>{{$item.Path}}</td>
+			<td>{{$item.Name}}</td>
 			<td>
 				<form action="/download" method="post" enctype="multipart/form-data">
-					<button type="submit" class="btn btn-sm btn-success" name="filename" value="{{$item}}">Download</button>
+					<input type="hidden" name="dir" value="{{$item.Path}}">
+					<button type="submit" class="btn btn-sm btn-success" name="filename" value="{{$item.Name}}">Download</button>
 				</form>
 			</td>
 		</tr>

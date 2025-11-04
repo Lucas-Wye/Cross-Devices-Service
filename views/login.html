@@ -1,0 +1,23 @@
+{{template "header.html" .}}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="text-center">登录</h2>
+            {{if .error}}
+                <div class="alert alert-danger">{{.error}}</div>
+            {{end}}
+            <form action="/login" method="post">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" name="username" id="username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" name="password" id="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">登录</button>
+            </form>
+        </div>
+    </div>
+</div>
+{{template "footer.html" .}}

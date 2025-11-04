@@ -10,23 +10,27 @@ type MainController struct {
 	beego.Controller
 }
 
-func Secret(user, realm string) string {
-	if user == models.GetAdminUsername() {
-		return models.GetAdminPassword()
-	}
-	if user == models.GetNormalUsername() {
-		return models.GetNormalPassword()
+func Secret(username, realm string) string {
+	if user, ok := models.GetUser(username); ok {
+		return user.PasswordHash
 	}
 	return ""
 }
 
 func (this *MainController) Prepare() {
-	a := NewBasicAuthenticator(ServiceName, Secret)
-	if a.CheckAuth(this.Ctx.Request) == "" {
-		a.RequireAuth(this.Ctx.ResponseWriter, this.Ctx.Request)
+	user := this.GetSession("user")
+	if user == nil {
+		this.Redirect("/login", 302)
+		return
 	}
+	this.Data["user"] = user
 }
 
 func (this *MainController) Get() {
 	this.TplName = "index.html"
+}
+
+func (c *MainController) Logout() {
+	c.DelSession("user")
+	c.Redirect("/login", 302)
 }

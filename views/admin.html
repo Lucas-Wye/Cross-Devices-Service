@@ -1,0 +1,157 @@
+{{template "header.html" .}}
+
+<div class="container">
+    <h2>Admin Panel</h2>
+
+    {{if .error}}
+    <div class="alert alert-danger">{{.error}}</div>
+    {{end}}
+
+    <h3>Users</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Users}}
+            <tr>
+                <td>{{.Username}}</td>
+                <td>{{.Role}}</td>
+                <td>
+                    <form action="/admin/delete_user" method="post" style="display:inline;">
+                        <input type="hidden" name="username" value="{{.Username}}">
+                        <button type="submit" class="btn btn-danger btn-sm" {{if eq .Username "admin"}}disabled{{end}}>Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h3>Add User</h3>
+    <form action="/admin/add_user" method="post" class="form-inline">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" name="username" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" name="password" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="role">Role</label>
+            <select name="role" class="form-control">
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Add User</button>
+    </form>
+
+    <hr>
+
+    <h3>Edit Permissions</h3>
+    <form action="/admin/update_permissions" method="post">
+        <div class="form-group">
+            <label for="username">User</label>
+            <select name="username" class="form-control" id="user-select">
+                {{range .Users}}
+                <option value="{{.Username}}">{{.Username}}</option>
+                {{end}}
+            </select>
+        </div>
+
+        <div id="permissions-container">
+            {{range .Users}}
+            <div id="permissions-{{.Username}}" class="user-permissions" style="display:none;">
+                <h4>Permissions for {{.Username}}</h4>
+                <div class="permissions-list">
+                    {{range .Permissions}}
+                    <div class="form-row permission-item">
+                        <div class="form-group col-md-4">
+                            <input type="text" name="path[]" class="form-control" value="{{.Path}}">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <div class="form-check">
+                                <input type="checkbox" name="read[]" class="form-check-input" value="{{.Path}}" {{if .Read}}checked{{end}}>
+                                <label class="form-check-label">Read</label>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <div class="form-check">
+                                <input type="checkbox" name="write[]" class="form-check-input" value="{{.Path}}" {{if .Write}}checked{{end}}>
+                                <label class="form-check-label">Write</label>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <button type="button" class="btn btn-danger btn-sm remove-permission">Remove</button>
+                        </div>
+                    </div>
+                    {{end}}
+                </div>
+                <button type="button" class="btn btn-success btn-sm add-permission">Add Permission</button>
+            </div>
+            {{end}}
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary">Update Permissions</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('user-select').addEventListener('change', function() {
+        var username = this.value;
+        var allPermissions = document.querySelectorAll('.user-permissions');
+        allPermissions.forEach(function(el) {
+            el.style.display = 'none';
+        });
+        var userPermissions = document.getElementById('permissions-' + username);
+        if (userPermissions) {
+            userPermissions.style.display = 'block';
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('add-permission')) {
+            var container = e.target.previousElementSibling;
+            var newItem = document.createElement('div');
+            newItem.className = 'form-row permission-item';
+            newItem.innerHTML = `
+                <div class="form-group col-md-4">
+                    <input type="text" name="path[]" class="form-control" placeholder="Directory Path">
+                </div>
+                <div class="form-group col-md-2">
+                    <div class="form-check">
+                        <input type="checkbox" name="read[]" class="form-check-input" value="">
+                        <label class="form-check-label">Read</label>
+                    </div>
+                </div>
+                <div class="form-group col-md-2">
+                    <div class="form-check">
+                        <input type="checkbox" name="write[]" class="form-check-input" value="">
+                        <label class="form-check-label">Write</label>
+                    </div>
+                </div>
+                <div class="form-group col-md-2">
+                    <button type="button" class="btn btn-danger btn-sm remove-permission">Remove</button>
+                </div>
+            `;
+            container.appendChild(newItem);
+        }
+
+        if (e.target && e.target.classList.contains('remove-permission')) {
+            e.target.closest('.permission-item').remove();
+        }
+    });
+
+    // Trigger change on load to show the first user's permissions
+    document.getElementById('user-select').dispatchEvent(new Event('change'));
+</script>
+
+{{template "footer.html" .}}

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"CrossDevicesService/models"
+	// "fmt"
 	"github.com/astaxie/beego"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -116,6 +117,7 @@ func (this *AdminController) UpdatePermissions() {
 	paths := this.GetStrings("path[]")
 	reads := this.GetStrings("read[]")
 	writes := this.GetStrings("write[]")
+	// fmt.Println("Updating permissions for user:", username, "path =", paths, "read =", reads, "write =", writes)
 
 	readMap := make(map[string]bool)
 	for _, r := range reads {

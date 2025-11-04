@@ -71,82 +71,107 @@
             {{range .Users}}
             <div id="permissions-{{.Username}}" class="user-permissions" style="display:none;">
                 <h4>Permissions for {{.Username}}</h4>
-                <div class="permissions-list">
-                    {{range .Permissions}}
-                    <div class="form-row permission-item">
-                        <div class="form-group col-md-4">
-                            <input type="text" name="path[]" class="form-control" value="{{.Path}}">
-                        </div>
-                        <div class="form-group col-md-2">
-                            <div class="form-check">
+                <table class="table table-bordered permissions-list">
+                    <thead>
+                        <tr>
+                            <th>Path</th>
+                            <th>Read</th>
+                            <th>Write</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range .Permissions}}
+                        <tr class="permission-item">
+                            <td>
+                                <input type="text" name="path[]" class="form-control" value="{{.Path}}">
+                            </td>
+                            <td class="text-center">
                                 <input type="checkbox" name="read[]" class="form-check-input" value="{{.Path}}" {{if .Read}}checked{{end}}>
-                                <label class="form-check-label">Read</label>
-                            </div>
-                        </div>
-                        <div class="form-group col-md-2">
-                            <div class="form-check">
+                            </td>
+                            <td class="text-center">
                                 <input type="checkbox" name="write[]" class="form-check-input" value="{{.Path}}" {{if .Write}}checked{{end}}>
-                                <label class="form-check-label">Write</label>
-                            </div>
-                        </div>
-                        <div class="form-group col-md-2">
-                            <button type="button" class="btn btn-danger btn-sm remove-permission">Remove</button>
-                        </div>
-                    </div>
-                    {{end}}
+                            </td>
+                            <td class="text-center">
+                                <button type="button" class="btn btn-danger btn-sm remove-permission">Remove</button>
+                            </td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+                <div class="mb-3">
+                    <button type="button" class="btn btn-success btn-sm add-permission">Add Permission</button>
                 </div>
-                <button type="button" class="btn btn-success btn-sm add-permission">Add Permission</button>
             </div>
             {{end}}
         </div>
-        <br>
+    </br>
         <button type="submit" class="btn btn-primary">Update Permissions</button>
     </form>
 </div>
 
-<script>
+    <script>
     document.getElementById('user-select').addEventListener('change', function() {
         var username = this.value;
         var allPermissions = document.querySelectorAll('.user-permissions');
         allPermissions.forEach(function(el) {
             el.style.display = 'none';
+            // Disable all inputs within the hidden permission blocks
+            el.querySelectorAll('input, button').forEach(function(input) {
+                input.disabled = true;
+            });
         });
         var userPermissions = document.getElementById('permissions-' + username);
         if (userPermissions) {
             userPermissions.style.display = 'block';
+            // Enable inputs for the selected user
+            userPermissions.querySelectorAll('input, button').forEach(function(input) {
+                input.disabled = false;
+            });
         }
-    });
-
-    document.addEventListener('click', function(e) {
+    });    document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('add-permission')) {
-            var container = e.target.previousElementSibling;
-            var newItem = document.createElement('div');
-            newItem.className = 'form-row permission-item';
-            newItem.innerHTML = `
-                <div class="form-group col-md-4">
-                    <input type="text" name="path[]" class="form-control" placeholder="Directory Path">
-                </div>
-                <div class="form-group col-md-2">
-                    <div class="form-check">
-                        <input type="checkbox" name="read[]" class="form-check-input" value="">
-                        <label class="form-check-label">Read</label>
-                    </div>
-                </div>
-                <div class="form-group col-md-2">
-                    <div class="form-check">
-                        <input type="checkbox" name="write[]" class="form-check-input" value="">
-                        <label class="form-check-label">Write</label>
-                    </div>
-                </div>
-                <div class="form-group col-md-2">
-                    <button type="button" class="btn btn-danger btn-sm remove-permission">Remove</button>
-                </div>
+            var table = e.target.closest('.user-permissions').querySelector('table.permissions-list tbody');
+            var newRow = document.createElement('tr');
+            newRow.className = 'permission-item';
+            newRow.innerHTML = `
+                <td><input type="text" name="path[]" class="form-control" placeholder="Directory Path"></td>
+                <td class="text-center"><input type="checkbox" name="read[]" class="form-check-input" value=""></td>
+                <td class="text-center"><input type="checkbox" name="write[]" class="form-check-input" value=""></td>
+                <td class="text-center"><button type="button" class="btn btn-danger btn-sm remove-permission">Remove</button></td>
             `;
-            container.appendChild(newItem);
+            table.appendChild(newRow);
+
+            // Sync checkbox values with the path input so backend can match by path
+            var pathInput = newRow.querySelector('input[name="path[]"]');
+            var readCb = newRow.querySelector('input[name="read[]"]');
+            var writeCb = newRow.querySelector('input[name="write[]"]');
+            var sync = function() {
+                var v = pathInput.value;
+                readCb.value = v;
+                writeCb.value = v;
+            };
+            // Initial sync and attach listeners
+            sync();
+            pathInput.addEventListener('input', sync);
+            pathInput.addEventListener('change', sync);
         }
 
         if (e.target && e.target.classList.contains('remove-permission')) {
             e.target.closest('.permission-item').remove();
+        }
+    });
+
+    // Keep checkbox values in sync for existing rows when path changes (edit existing entries)
+    document.addEventListener('input', function(e) {
+        if (e.target && e.target.matches('input[name="path[]"]')) {
+            var row = e.target.closest('.permission-item');
+            if (!row) return;
+            var v = e.target.value;
+            var readCb = row.querySelector('input[name="read[]"]');
+            var writeCb = row.querySelector('input[name="write[]"]');
+            if (readCb) readCb.value = v;
+            if (writeCb) writeCb.value = v;
         }
     });
 

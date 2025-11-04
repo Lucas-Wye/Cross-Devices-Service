@@ -23,7 +23,6 @@ func (this *MainController) Prepare() {
 		this.Redirect("/login", 302)
 		return
 	}
-	this.Data["user"] = user
 }
 
 func (this *MainController) Get() {

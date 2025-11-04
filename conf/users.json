@@ -2,7 +2,7 @@
     "users": [
         {
             "username": "admin",
-            "passwordHash": "$2a$10$vOxgVRi9r1lkGoPUh1akE.xxKD7ph5PWGZS1C3slHhYN85zDJQyHy",
+            "passwordHash": "$2a$10$.H97r08VnUqmTiDyJAP70.2rOrWiEiPQCXGWnnbFkNQ.cQNZsuFuK",
             "role": "admin",
             "permissions": [
                 {
@@ -19,21 +19,15 @@
         },
         {
             "username": "user",
-            "passwordHash": "$2a$10$iOgsq06kbplW2yr4eIp9N.idkZiBzj6xNN5U8xPVM/OswsTbqbJ9u",
+            "passwordHash": "$2a$10$FnycafHKBq0ytElPmC/abufqlkf3Wtnq/HXBJw2J3Xg5/98F2ON9O",
             "role": "user",
             "permissions": [
                 {
                     "path": "shared",
                     "read": true,
-                    "write": false
+                    "write": true
                 }
             ]
-        },
-        {
-            "username": "test",
-            "passwordHash": "$2a$10$8NE.40ZbCLJKkJsp3JmMDu8sNaUTAy/4qtiT1yym6D0cqwAFbxbgW",
-            "role": "user",
-            "permissions": []
         }
     ]
 }

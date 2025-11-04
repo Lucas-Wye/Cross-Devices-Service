@@ -52,6 +52,7 @@ func (c *FileController) GetUpload() {
 
 func (this *FileController) Upload() {
 	dir := this.GetString("dir")
+	// fmt.Println("[55] dir =", dir)
 	hasPermission := false
 	for _, p := range this.user.Permissions {
 		if (dir == "" && p.Path == "shared") || (dir == p.Path) {
@@ -79,6 +80,7 @@ func (this *FileController) Upload() {
 	targetDir := DownloadPath
 	if dir != "" {
 		targetDir = filepath.Join(DownloadPath, dir)
+		// fmt.Println("[82] Target directory:", targetDir)
 		if _, err := os.Stat(targetDir); os.IsNotExist(err) {
 			os.MkdirAll(targetDir, 0755)
 		}
@@ -116,20 +118,18 @@ func (this *FileController) Upload() {
 }
 
 func (this *FileController) GetList() {
-	var readableFiles []models.File
+	var trees []models.FileNode
 	for _, p := range this.user.Permissions {
 		if p.Read {
 			dirPath := filepath.Join(DownloadPath, p.Path)
 			if _, err := os.Stat(dirPath); !os.IsNotExist(err) {
-				files := models.GetFileList(dirPath)
-				for i := range files {
-					files[i].Path = p.Path // Add relative path info
+				if root, err := models.GetFileTree(DownloadPath, p.Path); err == nil && root != nil {
+					trees = append(trees, *root)
 				}
-				readableFiles = append(readableFiles, files...)
 			}
 		}
 	}
-	this.Data["list"] = readableFiles
+	this.Data["trees"] = trees
 	this.TplName = "download.html"
 }
 

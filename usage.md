@@ -10,20 +10,10 @@ go run main.go genpass hello
 ```
 输出 `$2a$10$gdt6CfQlR/OdTEWxWkV2Ve0yZiD3wBGKk5a65dc0T8bPdzsfK/8Yq`
 
-在Linux中，由于`$`符号的特殊性，设置环境变量时需要使用转移字符`\$`
-
 # Set environmental variable
 ```
 # Download and Upload directory 
-export LOCAL_DIR_PATH="/path"
-
-# admin user
-export ADMIN_USERNAME="" 
-export ADMIN_PASSWORD="" 
-
-# user
-export NORMAL_USERNAME=""
-export NORMAL_PASSWORD="" 
+export LOCAL_DIR_PATH="/path" 
 ```
 
 # 启动服务

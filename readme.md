@@ -8,12 +8,4 @@ Run `make` to start the service.
 ```
 # Download and Upload directory 
 LOCAL_DIR_PATH="/path"
-
-# admin user
-ADMIN_USERNAME="" 
-ADMIN_PASSWORD="" 
-
-# user
-NORMAL_USERNAME=""
-NORMAL_PASSWORD="" 
 ```

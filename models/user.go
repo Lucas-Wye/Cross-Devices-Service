@@ -60,8 +60,33 @@ func GetUserConfig() *UserConfig {
 
 func GetUser(username string) (*User, bool) {
 	config := GetUserConfig()
-	for _, user := range config.Users {
+	for i, user := range config.Users {
 		if user.Username == username {
+			// 如果是admin，自动拥有所有文件夹的读写权限
+			if user.Role == "admin" {
+				// 获取所有文件夹名
+				folders, err := os.ReadDir(GetLocalDirPath())
+				if err == nil {
+					permMap := make(map[string]bool)
+					for _, p := range user.Permissions {
+						permMap[p.Path] = true
+					}
+					for _, f := range folders {
+						if f.IsDir() {
+							name := f.Name()
+							if !permMap[name] {
+								user.Permissions = append(user.Permissions, Permission{
+									Path:  name,
+									Read:  true,
+									Write: true,
+								})
+							}
+						}
+					}
+					// 更新内存中的用户权限
+					config.Users[i] = user
+				}
+			}
 			return &user, true
 		}
 	}

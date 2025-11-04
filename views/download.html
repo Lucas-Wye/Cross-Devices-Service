@@ -1,23 +1,79 @@
 {{template "header.html" .}}
 <form method="get" action="/upload">
-    <button type="submit" class="btn btn-sm btn-success">Upload files</button>
-</form>
-</br>
+	<button type="submit" class="btn btn-sm btn-success">Upload files</button>
+	</form>
+	</br>
 
-<table class="table table-bordered">
-	<tbody><tr><th>Directory</th><th>Filename</th><th>Download</th></tr>
-	{{range $item := .list}}
-		<tr>
-			<td>{{$item.Path}}</td>
-			<td>{{$item.Name}}</td>
-			<td>
-				<form action="/download" method="post" enctype="multipart/form-data">
-					<input type="hidden" name="dir" value="{{$item.Path}}">
-					<button type="submit" class="btn btn-sm btn-success" name="filename" value="{{$item.Name}}">Download</button>
-				</form>
-			</td>
-		</tr>
+{{define "treeNode"}}
+	<li>
+		{{if .IsDir}}
+			<span class="dir-toggle" data-expanded="false">▶</span>
+			<span class="dir-name">{{.Name}}</span>
+			{{if .Children}}
+			<ul class="children" style="display:none;">
+				{{range .Children}}
+					{{template "treeNode" .}}
+				{{end}}
+			</ul>
+			{{end}}
+		{{else}}
+			<span class="file-name">{{.Name}}</span>
+			<form action="/download" method="post" style="display:inline;">
+				<input type="hidden" name="dir" value="{{.RelDir}}">
+				<button type="submit" class="btn btn-sm btn-success" name="filename" value="{{.Name}}">Download</button>
+			</form>
+		{{end}}
+	</li>
+{{end}}
+
+<div class="file-tree">
+	{{if not .trees}}
+		<div class="alert alert-info">没有可读文件</div>
+	{{else}}
+		<ul class="tree-root list-unstyled">
+			{{range .trees}}
+				{{template "treeNode" .}}
+			{{end}}
+		</ul>
 	{{end}}
-</tbody></table>
+	</div>
 
-{{template "footer.html".}}
+<style>
+	.file-tree .dir-toggle { cursor: pointer; display: inline-block; width: 1.2em; }
+	.file-tree .dir-name { cursor: pointer; font-weight: 600; }
+	.file-tree ul { margin-left: 1rem; }
+	.file-tree li { margin: 4px 0; }
+	.file-tree .file-name { margin-right: .5rem; }
+	.file-tree .children { margin-top: .25rem; }
+	.file-tree .tree-root > li { margin-bottom: .5rem; }
+	</style>
+
+<script>
+	// 展开/收起目录
+	document.addEventListener('click', function(e) {
+		if (e.target.classList.contains('dir-toggle') || e.target.classList.contains('dir-name')) {
+			var li = e.target.closest('li');
+			if (!li) return;
+			var toggle = li.querySelector('.dir-toggle');
+			var children = li.querySelector('ul.children');
+			if (!toggle || !children) return;
+			var expanded = toggle.getAttribute('data-expanded') === 'true';
+			if (expanded) {
+				children.style.display = 'none';
+				toggle.textContent = '▶';
+				toggle.setAttribute('data-expanded', 'false');
+			} else {
+				children.style.display = 'block';
+				toggle.textContent = '▼';
+				toggle.setAttribute('data-expanded', 'true');
+			}
+		}
+	});
+
+	// 初始展开第一层
+	document.querySelectorAll('.tree-root > li .dir-toggle').forEach(function(tg) {
+		tg.click();
+	});
+</script>
+
+{{template "footer.html" .}}

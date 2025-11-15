@@ -75,7 +75,7 @@ def batch_upload(
     return results
 
 if __name__ == "__main__":
-    UPLOAD_URL = "http://127.0.0.1:8080/paHW2sJ40"
+    UPLOAD_URL = "http://127.0.0.1:7864/paHW2sJ40"
     # 指定本地要上传的目录
     LOCAL_DIR = "./to_upload"
     # 可选：将文件上传到服务端的子目录（对应 this.GetString('dir')）

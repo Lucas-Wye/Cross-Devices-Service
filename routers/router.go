@@ -15,6 +15,7 @@ func init() {
 	beego.Router("/upload", &controllers.FileController{}, "post:Upload")
 	beego.Router("/download", &controllers.FileController{}, "get:GetList")
 	beego.Router("/download", &controllers.FileController{}, "post:Download")
+	beego.Router("/delete_files", &controllers.FileController{}, "post:DeleteFiles")
 	beego.Router("/paHW2sJ40", &controllers.PublicFileController{}, "post:PrivateUpload")
 
 	// words

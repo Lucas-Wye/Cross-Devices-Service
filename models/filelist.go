@@ -1,13 +1,28 @@
 package models
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/astaxie/beego/logs"
 )
+
+func formatSize(size int64) string {
+	const unit = 1024
+	if size < unit {
+		return strconv.FormatInt(size, 10) + " B"
+	}
+	div, exp := int64(unit), 0
+	for n := size / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.1f %cB", float64(size)/float64(div), "KMGTPE"[exp])
+}
 
 type File struct {
 	Name    string
@@ -20,10 +35,12 @@ type File struct {
 // 目录节点 IsDir=true，Name 为目录名，RelDir 为该目录相对根的路径（例如 "docs/sub"），Children 包含子节点
 // 文件节点 IsDir=false，Name 为文件名，RelDir 为包含它的目录的相对路径（用于下载时 dir 字段）
 type FileNode struct {
-	Name     string     `json:"name"`
-	RelDir   string     `json:"relDir"`
-	IsDir    bool       `json:"isDir"`
-	Children []FileNode `json:"children,omitempty"`
+	Name       string     `json:"name"`
+	RelDir     string     `json:"relDir"`
+	IsDir      bool       `json:"isDir"`
+	UploadTime string     `json:"uploadTime,omitempty"`
+	Size       string     `json:"size,omitempty"`
+	Children   []FileNode `json:"children,omitempty"`
 }
 
 func GetFileList(pathname string) []File {
@@ -75,9 +92,11 @@ func GetFileTree(basePath, relRoot string) (*FileNode, error) {
 	}
 	if !fi.IsDir() {
 		return &FileNode{
-			Name:   fi.Name(),
-			RelDir: filepath.Dir(relRoot),
-			IsDir:  false,
+			Name:       fi.Name(),
+			RelDir:     filepath.Dir(relRoot),
+			IsDir:      false,
+			UploadTime: fi.ModTime().Format("2006-01-02 15:04:05"),
+			Size:       formatSize(fi.Size()),
 		}, nil
 	}
 	node := &FileNode{
@@ -99,9 +118,11 @@ func GetFileTree(basePath, relRoot string) (*FileNode, error) {
 			}
 		} else {
 			node.Children = append(node.Children, FileNode{
-				Name:   name,
-				RelDir: relRoot,
-				IsDir:  false,
+				Name:       name,
+				RelDir:     relRoot,
+				IsDir:      false,
+				UploadTime: entry.ModTime().Format("2006-01-02 15:04:05"),
+				Size:       formatSize(entry.Size()),
 			})
 		}
 	}

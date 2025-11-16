@@ -1,0 +1,154 @@
+{{template "admin_header.html" .}}
+
+<form method="get" action="/upload">
+	<button type="submit" class="btn btn-sm btn-success">Upload files</button>
+	</form>
+	</br>
+
+
+<form id="delete-form" action="/delete_files" method="post">
+	<button type="submit" class="btn btn-sm btn-danger">Delete Selected</button>
+	<button type="button" id="delete-all-btn" class="btn btn-sm btn-danger" style="margin-left: 10px;">Delete All</button>
+</form>
+</br>
+
+
+{{define "treeNode"}}
+	<li>
+		{{if .IsDir}}
+			<input type="checkbox" class="dir-checkbox file-checkbox" value="{{.RelDir}}">
+			<span class="dir-toggle" data-expanded="false">▶</span>
+			<span class="dir-name">{{.Name}}</span>
+			{{if .Children}}
+			<ul class="children" style="display:none;">
+				{{range .Children}}
+					{{template "treeNode" .}}
+				{{end}}
+			</ul>
+			{{end}}
+		{{else}}
+			<input type="checkbox" class="file-checkbox" value="{{.RelDir}}/{{.Name}}">
+			<form action="/download" method="post" style="display:inline;">
+				<input type="hidden" name="dir" value="{{.RelDir}}">
+				<button type="submit" class="btn btn-sm btn-success" name="filename" value="{{.Name}}">Download</button>
+			</form>
+			<span class="file-name">{{.Name}}</span>
+			<span class="file-info">上传时间: {{.UploadTime}} | 大小: {{.Size}}</span>
+		{{end}}
+	</li>
+{{end}}
+
+<div class="file-tree">
+	{{if not .trees}}
+		<div class="alert alert-info">没有可读文件</div>
+	{{else}}
+		<ul class="tree-root list-unstyled">
+			{{range .trees}}
+				{{template "treeNode" .}}
+			{{end}}
+		</ul>
+	{{end}}
+	</div>
+
+<style>
+	.file-tree .dir-toggle { cursor: pointer; display: inline-block; width: 1.2em; }
+	.file-tree .dir-name { cursor: pointer; font-weight: 600; }
+	.file-tree ul { margin-left: 1rem; }
+	.file-tree li { margin: 4px 0; }
+	.file-tree .file-name { margin-right: .5rem; }
+	.file-tree .children { margin-top: .25rem; }
+	.file-tree .tree-root > li { margin-bottom: .5rem; }
+	</style>
+
+<script>
+	// 展开/收起目录
+	document.addEventListener('click', function(e) {
+		if (e.target.classList.contains('dir-toggle') || e.target.classList.contains('dir-name')) {
+			var li = e.target.closest('li');
+			if (!li) return;
+			var toggle = li.querySelector('.dir-toggle');
+			var children = li.querySelector('ul.children');
+			if (!toggle || !children) return;
+			var expanded = toggle.getAttribute('data-expanded') === 'true';
+			if (expanded) {
+				children.style.display = 'none';
+				toggle.textContent = '▶';
+				toggle.setAttribute('data-expanded', 'false');
+			} else {
+				children.style.display = 'block';
+				toggle.textContent = '▼';
+				toggle.setAttribute('data-expanded', 'true');
+			}
+		}
+	});
+
+	// 初始展开第一层
+	document.querySelectorAll('.tree-root > li .dir-toggle').forEach(function(tg) {
+		tg.click();
+	});
+
+	// 目录checkbox选中时，自动选中/取消选中子项
+	document.addEventListener('change', function(e) {
+		if (e.target.classList.contains('dir-checkbox')) {
+			var checked = e.target.checked;
+			var li = e.target.closest('li');
+			toggleChildren(li, checked);
+		}
+	});
+
+	function toggleChildren(li, checked) {
+		var checkboxes = li.querySelectorAll('.file-checkbox');
+		checkboxes.forEach(function(cb) {
+			cb.checked = checked;
+		});
+	}
+
+	// 删除文件
+	document.getElementById('delete-form').addEventListener('submit', function(e) {
+		e.preventDefault();
+		var checkedFiles = [];
+		document.querySelectorAll('.file-checkbox:checked').forEach(function(checkbox) {
+			checkedFiles.push(checkbox.value);
+		});
+
+		if (checkedFiles.length > 0) {
+			if (confirm('Are you sure you want to delete the selected files?')) {
+				checkedFiles.forEach(function(file) {
+					var input = document.createElement('input');
+					input.type = 'hidden';
+					input.name = 'files';
+					input.value = file;
+					e.target.appendChild(input);
+				});
+				this.submit();
+			}
+		} else {
+			alert('Please select files to delete.');
+		}
+	});
+
+	// 一键全部删除
+	document.getElementById('delete-all-btn').addEventListener('click', function() {
+		if (confirm('Are you sure you want to delete ALL files?')) {
+			var allFiles = [];
+			document.querySelectorAll('.file-checkbox').forEach(function(cb) {
+				allFiles.push(cb.value);
+			});
+			if (allFiles.length > 0) {
+				var form = document.getElementById('delete-form');
+				allFiles.forEach(function(file) {
+					var input = document.createElement('input');
+					input.type = 'hidden';
+					input.name = 'files';
+					input.value = file;
+					form.appendChild(input);
+				});
+				form.submit();
+			} else {
+				alert('No files to delete.');
+			}
+		}
+	});
+</script>
+
+{{template "footer.html" .}}

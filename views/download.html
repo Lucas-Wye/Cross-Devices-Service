@@ -17,11 +17,12 @@
 			</ul>
 			{{end}}
 		{{else}}
-			<span class="file-name">{{.Name}}</span>
 			<form action="/download" method="post" style="display:inline;">
 				<input type="hidden" name="dir" value="{{.RelDir}}">
 				<button type="submit" class="btn btn-sm btn-success" name="filename" value="{{.Name}}">Download</button>
 			</form>
+			<span class="file-name">{{.Name}}</span>
+			<span class="file-info">上传时间: {{.UploadTime}} | 大小: {{.Size}}</span>
 		{{end}}
 	</li>
 {{end}}
@@ -44,6 +45,7 @@
 	.file-tree ul { margin-left: 1rem; }
 	.file-tree li { margin: 4px 0; }
 	.file-tree .file-name { margin-right: .5rem; }
+	.file-tree .file-info { margin-left: 1rem; color: #666; font-size: 0.9em; }
 	.file-tree .children { margin-top: .25rem; }
 	.file-tree .tree-root > li { margin-bottom: .5rem; }
 	</style>
